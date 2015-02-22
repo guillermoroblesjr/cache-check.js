@@ -42,7 +42,7 @@ module.exports = function (grunt) {
       },
       js: {
         files: ['<%= config.app %>/scripts/{,*/}*.js'],
-        tasks: ['jshint:classjs'],
+        tasks: ['jshint:all'],
         options: {
           livereload: true
         }
@@ -127,15 +127,9 @@ module.exports = function (grunt) {
           hostname: 'localhost',
           middleware: function(connect) {
             return [
-              //connect.static('coverage/phantomjs/lcov-report'),
-              //connect.static('/coverage/PhantomJS\\ 201.9.8\\ 20(Windows\\ 208)/lcov-report'),
               connect.static('coverage/reports/phantomjs'),
-
               connect().use('/bower_components', connect.static('./bower_components')),
-              connect().use('/node_modules', connect.static('./node_modules')),
-              //connect().use('/coverage/PhantomJS%201.9.8%20(Windows%208)/lcov-report', connect.static('./coverage/PhantomJS%201.9.8%20(Windows%208)/lcov-report')),
-
-              //connect.static('./coverage/PhantomJS%201.9.8%20(Windows%208)/lcov-report')
+              connect().use('/node_modules', connect.static('./node_modules'))
             ];
           }
         }
@@ -197,7 +191,7 @@ module.exports = function (grunt) {
           mocha: {
               ignoreLeaks: false
           },
-          reporter: 'Spec',
+          reporter: 'html-cov',
           urls: ['http://<%= connect.test.options.hostname %>:<%= connect.test.options.port %>/index.html']
         }
       }

@@ -1,14 +1,18 @@
 module.exports = function (config) {
   config.set({
     // base path, that will be used to resolve files and exclude
-    basePath: '',
+    basePath: './',
 
     frameworks: ['mocha', 'chai', 'sinon', 'sinon-chai'],
 
     // list of files / patterns to load in the browser
     files: [
-      //'app/**/*.js',
-      'app/scripts/Class.js/*.js',
+      //'app/scripts/**/*.js',
+      //{pattern: 'app/scripts/**/*.js', watched: true, served: true, included: true},
+      //'app/scripts/Class.js/*.js',
+      'app/scripts/*js',
+      'app/scripts/bridged-worker.min.js',
+      'app/scripts/cache-check.js/*',
       'test/**/*.js'
       // 'test/**/*_test.js'
     ],
