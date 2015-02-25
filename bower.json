@@ -1,30 +1,10 @@
 {
-  "name": "cache-check.js",
-  "version": "0.0.0",
+  "name": "cache-check",
+  "version": "0.1.0",
   "homepage": "https://github.com/guillermoroblesjr/cache-check.js",
   "authors": [
     "Guillermo Robles",
     "Jr. <will.robles@gmail.com>"
-  ],
-  "description": "check if files are cached on the client",
-  "main": "./app/scripts/cache-check.js",
-  "moduleType": [
-    "globals"
-  ],
-  "dependencies": {
-  },
-  "devDependencies": {
-    "modernizr": "~2.8.2",
-    "foundation": "~5.5.1",
-    "mocha": "~2.1.0",
-    "chai": "~2.0.0",
-    "requirejs": "~2.1.16"
-  },
-  "keywords": [
-    "client",
-    "browser",
-    "cache",
-    "checking"
   ],
   "license": "MIT",
   "ignore": [
