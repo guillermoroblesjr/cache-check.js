@@ -1,0 +1,8 @@
+app/src/**/*.js
+
+app/scripts/Class.js/**/*.js
+app/scripts/bridged-worker.min.js
+app/scripts/main.js
+
+app/scripts/cache-check.js/worker.js
+app/scripts/cache-check.js/cache-check.js

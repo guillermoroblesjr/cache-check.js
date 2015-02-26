@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     },
     tests: {
       options: {
-        base: ['.', './tests'],
+        base: ['.', './app', './node_modules', './tests'],
         port: 8001,
         open: true
       }

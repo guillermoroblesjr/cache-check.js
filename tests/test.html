@@ -4,13 +4,16 @@
     <title>Mocha Tests</title>
     <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 
-    <script src="../node_modules/chai/chai.js"></script>
+    <script src="node_modules/chai/chai.js"></script>
     <script src="../node_modules/mocha/mocha.js"></script>
 
-    <script src="../app/src/math/addition.js"></script>
-    <script src="../app/src/math/subtraction.js"></script>
-    <script src="../app/src/spelling/plurals.js"></script>
-    <script src="../app/src/spelling/vowels.js"></script>
+    <!-- Add src -->
+    <script src="../app/scripts/bridged-worker.min.js"></script>
+    <script src="../app/scripts/Class.js/Class.js"></script>
+    <script src="../app/scripts/cache-check.js/worker.js"></script>
+    <script src="../app/scripts/cache-check.js/cache-check.js"></script>
+    <script src="../app/scripts/main.js"></script>
+    <!-- End: Add src -->
 
     <script type="text/javascript" src="../node_modules/blanket/dist/qunit/blanket.js"
             data-cover-flags="branchTracking"
@@ -29,11 +32,9 @@
         }
     </script>
 
-    <script src="specs/math/addition-specs.js"></script>
-    <script src="specs/math/subtraction-specs.js"></script>
-    <script src="specs/spelling/plurals-specs.js"></script>
-    <script src="specs/spelling/vowels-specs.js"></script>
-
+    <!-- Add specs -->
+    <script src="specs/cache-check.js/cache-check.js"></script>
+    <!-- End: Add specs -->
 </head>
 <body>
 <div id="mocha"></div>

@@ -1,127 +1,136 @@
-// This will be separated!
+(function(window){
 
-(function(){
+  "use strict";
 
- // var main = function(){
- //    var workerCode = function () {
- //        "use strict;" //this will become the first line of the worker
+  // Make sure all dependencies are available!
+  var checkDependencies = function(deps){
+    var missingDependencies = false;
+    for (var i = 0, len = deps.length; i< len; i++) {
+      (function(i){
 
- //        var CalculateSomething = function(options) {
+        var currentDep = deps[i];
 
- //          var linkCheck = function linkCheck(options){
+        // checkBy is: window
+        if (currentDep.checkBy === 'window') {
+          if (window[currentDep.globalName] === undefined) {
+            console.error('You are missing a dependency: ', 
+              '\n' + 'Name: ' + currentDep.name,
+              '\n' + 'Version: ' + currentDep.version,
+              '\n' + 'Homepage: ' + currentDep.homepage
+            );
+            missingDependencies = true;
+          };
+        };
 
- //            var url = options.url,
- //                timeout = options.timeout || false,
- //                isAsync = options.isAsync === true ? true : false,
- //                ontimeout = options.ontimeout || ontimeout;
+      })(i);
+    };
+    return missingDependencies;
+  };
 
- //            var reqCnt = 0;
+  var missingDeps = checkDependencies([{
+    name: 'Class.js',
+    version: '*',
+    homepage: 'https://github.com/guillermoroblesjr/Class.js',
+    url: null,
+    errorMessage: null,
+    globalName: 'Class',
+    checkBy: 'window'
+  }]);
 
- //            var logStuff = function(xhr, options){
- //              var headers = xhr.getAllResponseHeaders();
-              
- //              console.log('options: ', options, '\n xhr is: ', xhr);
- //              console.log('allResponseHeaders are: ', '\n', headers);
+  if (missingDeps === true) {
+    return;
+  };
 
- //              var data = { headers: headers };
- //              main.DisplayResult(data);
- //            };
+  // Make the CacheCheck class
+  var CacheCheckClass = Class.make(function CacheCheckClass(){
+    this.workerIsLoaded = false;
+    this.webWorkers = {};
+    this.cacheCheckWorker = null;
+    this.addWorkerFunctionality = function(worker){
+      // when data comes back from the worker
+      worker.onmessage = function(e) {
+        console.log( 'Message received from worker' );
+        console.log( 'The data is: ', e.data );
 
- //            var xhr = new XMLHttpRequest();
- //            xhr.onabort = function(e){
- //              console.log('onabort: ', e);
- //            };
- //            xhr.onerror = function(e){
- //              console.log('onerror: ', e);
- //            };
- //            xhr.onload = function(e){
- //              console.log('onload: ', e);
- //              if (xhr.readyState === 4) {
- //                if (xhr.status === 200) {
- //                  console.log(xhr.responseText);
- //                } else {
- //                  console.error(xhr.statusText);
- //                }
- //              }
- //              logStuff(xhr, options);
- //            };
- //            xhr.onloadend = function(e){
- //              console.log('onloadend: ', e);
- //              main.DisplayResult();
- //              //debugger;
- //                // for (var i = 0; i < items.length; ++i) {
- //                //   var req = items[i];
- //                //   console.log('XHR ' + req.name + ' took ' + req.duration + ' ms');
- //                // }
- //            };
- //            xhr.onloadstart = function(e){
- //              apples('start');
- //              // window.performance.mark('mark_end_xhr');
- //              // reqCnt++;
- //              // window.performance.measure('measure_xhr_' + reqCnt, 'mark_start_xhr', 'mark_end_xhr');
- //              console.log('onloadstart: ', e);
- //            };
- //            xhr.onprogress = function(e){
- //              console.log('onprogress: ', e);
- //            };
- //            xhr.onereadystatechange = function(e){
- //              console.log('onereadystatechange: ', e);
- //            };
- //            xhr.ontimeout = function (e) {
- //              console.log('ontimeout: ', e);
- //              console.error("The request for " + url + " timed out.");
- //            };
- //            xhr.onload = function() {
- //              if (xhr.readyState === 4) { 
- //                if (xhr.status === 200) {
- //                  callback.apply(xhr, args);
- //                } else {
- //                  console.error(xhr.statusText);
- //                }
- //              }
- //            };
+        // endTime = performance.now();
+        // console.log('difference: ', (endTime - startTime) * .01, ' ms');
 
- //            xhr.open("HEAD", url, true);
- //            xhr.timeout = 1;
- //            //window.performance.mark('mark_start_xhr');
- //            xhr.send(null);
- //          };
+        var result = JSON.parse(e.data.target);
+        console.log('the result is: ', result);
+      };
 
- //          linkCheck(options);
- //        };
- //    };
+    };
+    this.loadWorker = function(workerUrl){
+      // location starts from HTML file
+      this.cacheCheckWorker = new Worker(workerUrl);
+      this.addWorkerFunctionality(this.cacheCheckWorker);
+      this.workerIsLoaded = true;
+    };
+    this.verify = function(options, items){
+      // setup options
+      this.webWorkers.cacheCheckWorker = options.webWorkers.cacheCheckWorker || 'uh-oh';
+      // make sure we have an array
+      if (Array.isArray(items) !== true) {
+        console.error('You must pass in an array of objects.');
+        return;
+      };
+      // load the worker if it has not been loaded
+      if (this.workerIsLoaded !== true) {
+        this.loadWorker(this.webWorkers.cacheCheckWorker);
+      };
+      // loop through each item
+      for (var i = 0, len = items.length; i < len; i++) {
+        (function(i, cacheCheck){
+          
+          var item = items[i];
+          // debugger;
+          cacheCheck.cacheCheckWorker.postMessage({options: item}); 
 
- //    var start, end;
+        })(i, this);
+      };
+      var data = { stuff: true };
+      
+    };
+    return this;
+  });
 
- //    var DisplayResult = function (data) {
- //    end = performance.now();
- //    console.log('difference: ', (end - start) * .01, ' ms');
- //    console.log('worker is done');
- //    };
+  // Attach to the window
+  var CacheCheck = window.CacheCheck = Object.create(CacheCheckClass.prototype);
 
- //    var theWorker = BuildBridgedWorker( 
- //  workerCode, 
- //  ["CalculateSomething"],
- //  ["DisplayResult"], 
- //  [DisplayResult]
- //    );
+  //----------------------------------------------
 
- //    var options = {
- //      url: 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js',
- //      timeout: 1,
- //      isAsync: false
- //    };
- //    start = performance.now();
- //    theWorker.CalculateSomething(options);
- // };
+  // // we will time the checking to check for performance
+  // var startTime, endTime;
+
+  // // location starts from HTML file
+  // var cacheCheckWorker = new Worker("./scripts/cache-check.js/worker.js");
+
+  // // when data comes back from the worker
+  // cacheCheckWorker.onmessage = function(e) {
+  //   console.log( 'Message received from worker' );
+  //   console.log( 'The data is: ', e.data );
+
+  //   endTime = performance.now();
+  //   console.log('difference: ', (endTime - startTime) * .01, ' ms');
+
+  //   var result = JSON.parse(e.data.target);
+  //   console.log('the result is: ', result);
+  // };
+
+  // var data = {
+  //   options: {
+  //     url: 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js',
+  //     timeout: 1,
+  //     isAsync: false
+  //   }
+  // };
+  // startTime = performance.now();
+
+  // cacheCheckWorker.postMessage(data);
 
 
- if (BuildBridgedWorker !== undefined) {
-  // main();
-  console.log('did not run buddy!  1111111111111111111111');
 
- } else {
-  console.log('did not run buddy!');
- }
 
-})()
+
+
+})(window, undefined);
