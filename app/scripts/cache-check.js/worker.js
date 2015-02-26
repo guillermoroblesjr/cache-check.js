@@ -1,4 +1,8 @@
-'use strict';
+"use strict";
+
+importScripts('../Class.js/Class.js');
+
+console.log(Class);
 
 onmessage = function(e) {
   console.log('Message received from main script');
@@ -51,7 +55,7 @@ onmessage = function(e) {
 
       var version = '1.7.2';
       var versionCheck = new VersionCheck(version);
-      debugger;
+      // debugger;
 
       linkCheck(options);
 
@@ -132,7 +136,7 @@ onmessage = function(e) {
         newUrl = url.replace('{{version}}', currentVersion);
       }
       
-      debugger;
+      // debugger;
 
       return newUrl;
     };

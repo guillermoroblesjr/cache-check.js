@@ -1,4 +1,8 @@
-'use strict';
+"use strict";
+
+importScripts('../Class.js/Class.js');
+
+console.log(Class);
 
 onmessage = function(e) {
   console.log('Message received from main script');
@@ -6,15 +10,36 @@ onmessage = function(e) {
   var dataOut = {dataIn: e.data};
   var options = e.data.options;
 
+  var versionCounter = 0;
+  var currentVersion = options.rangeMin;
+
+
   var linkCheck = function linkCheck(options){
 
     // Default values
     var url = options.url,
-        timeout = options.timeout || false,
+        timeout = options.timeout || 1,
         isAsync = options.isAsync === true ? true : false,
         ontimeout = options.ontimeout || ontimeout;
 
     var reqCnt = 0;
+
+    var VersionCheck = function(data){
+      this.currentVersion = data.currentVersion;
+      this.complete = false;
+    };
+
+    var versionCheck = new VersionCheck('0.0.0');
+
+    
+    var continueCheckingVersions = function(){
+      if (versionCounter <= 2) {
+        versionCounter++;
+        return true;
+      } else {
+        return false;
+      }
+    };
 
     var logStuff = function(xhr, options){
       var headers = xhr.getAllResponseHeaders();
@@ -24,6 +49,16 @@ onmessage = function(e) {
 
       var data = { headers: headers };
       main.DisplayResult(data);
+    };
+
+    var checkForDifferentVersions = function(options){
+
+      var version = '1.7.2';
+      var versionCheck = new VersionCheck(version);
+      // debugger;
+
+      linkCheck(options);
+
     };
 
     var addFunctionalityToXhr = function(xhr){
@@ -47,14 +82,20 @@ onmessage = function(e) {
       };
       xhr.onloadend = function(e){
         console.log('onloadend: ', e);
-        // send data back to caller
-        dataOut.target = JSON.stringify(e.target);
-        postMessage(dataOut);
-        //debugger;
-          // for (var i = 0; i < items.length; ++i) {
-          //   var req = items[i];
-          //   console.log('XHR ' + req.name + ' took ' + req.duration + ' ms');
-          // }
+        
+        if (versionCheck.complete === true) {
+          // send data back to caller
+          dataOut.target = JSON.stringify(e.target);
+          postMessage(dataOut);
+        } else {
+          // check for different versions
+          if (continueCheckingVersions() === true) {
+            checkForDifferentVersions(options);
+          } else {
+            //http://localhost:8001/test.html
+            console.log('stopped checking for versions');
+          }
+        }
       };
       xhr.onloadstart = function(e){
         // window.performance.mark('mark_end_xhr');
@@ -84,19 +125,32 @@ onmessage = function(e) {
       return xhr;
     };
 
+    var buildUrl = function(options){
+      var url = options.url,
+          newUrl = null;
+      if (currentVersion === options.rangeMin) { 
+        currentVersion = '1.6.0';
+        newUrl = url.replace('{{version}}', currentVersion);
+        currentVersion = '1.8.0';
+      } else {
+        newUrl = url.replace('{{version}}', currentVersion);
+      }
+      
+      // debugger;
+
+      return newUrl;
+    };
+
+    url = buildUrl(options);
+
     var xhr = new XMLHttpRequest();
 
     xhr = addFunctionalityToXhr(xhr);
 
     xhr.open("HEAD", url, true);
     xhr.timeout = 1;
-    //window.performance.mark('mark_start_xhr');
     xhr.send(null);
   };
 
   linkCheck(options);
-
-  // // send data back to caller
-  // postMessage(dataOut);
-
 }
