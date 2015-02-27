@@ -46,6 +46,8 @@
     this.workerIsLoaded = false;
     this.webWorkers = {};
     this.cacheCheckWorker = null;
+    // add methods to the worker
+    // i.e. worker.message
     this.addWorkerFunctionality = function(worker){
       // when data comes back from the worker
       worker.onmessage = function(e) {
@@ -66,7 +68,9 @@
       this.addWorkerFunctionality(this.cacheCheckWorker);
       this.workerIsLoaded = true;
     };
-    this.verify = function(options, items){
+    // methods for the user to utilize
+    // i.e. to get a file but check if cached first
+    this.fetch = function(options, items){
       // setup options
       this.webWorkers.cacheCheckWorker = options.webWorkers.cacheCheckWorker || 'uh-oh';
       // make sure we have an array
@@ -78,17 +82,18 @@
       if (this.workerIsLoaded !== true) {
         this.loadWorker(this.webWorkers.cacheCheckWorker);
       };
-      // loop through each item
-      for (var i = 0, len = items.length; i < len; i++) {
-        (function(i, cacheCheck){
-          
-          var item = items[i];
-          // debugger;
-          cacheCheck.cacheCheckWorker.postMessage({options: item}); 
+      // post to the web worker
+      var jsonOptions = JSON.stringify(options), 
+          jsonItems = JSON.stringify(items);
+      this.cacheCheckWorker.postMessage({options: jsonOptions, items: jsonItems}); 
 
-        })(i, this);
-      };
-      var data = { stuff: true };
+      // // loop through each item, posting it to the web worker
+      // for (var i = 0, len = items.length; i < len; i++) {
+      //   (function(i, cacheCheck){
+      //     var item = items[i];
+      //     cacheCheck.cacheCheckWorker.postMessage({options: options, item: item}); 
+      //   })(i, this);
+      // };
       
     };
     return this;
@@ -97,40 +102,41 @@
   // Attach to the window
   var CacheCheck = window.CacheCheck = Object.create(CacheCheckClass.prototype);
 
-  //----------------------------------------------
-
-  // // we will time the checking to check for performance
-  // var startTime, endTime;
-
-  // // location starts from HTML file
-  // var cacheCheckWorker = new Worker("./scripts/cache-check.js/worker.js");
-
-  // // when data comes back from the worker
-  // cacheCheckWorker.onmessage = function(e) {
-  //   console.log( 'Message received from worker' );
-  //   console.log( 'The data is: ', e.data );
-
-  //   endTime = performance.now();
-  //   console.log('difference: ', (endTime - startTime) * .01, ' ms');
-
-  //   var result = JSON.parse(e.data.target);
-  //   console.log('the result is: ', result);
-  // };
-
-  // var data = {
-  //   options: {
-  //     url: 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js',
-  //     timeout: 1,
-  //     isAsync: false
-  //   }
-  // };
-  // startTime = performance.now();
-
-  // cacheCheckWorker.postMessage(data);
-
-
-
-
-
-
 })(window, undefined);
+
+
+
+
+
+
+
+//----------------------------------------------
+
+// // we will time the checking to check for performance
+// var startTime, endTime;
+
+// // location starts from HTML file
+// var cacheCheckWorker = new Worker("./scripts/cache-check.js/worker.js");
+
+// // when data comes back from the worker
+// cacheCheckWorker.onmessage = function(e) {
+//   console.log( 'Message received from worker' );
+//   console.log( 'The data is: ', e.data );
+
+//   endTime = performance.now();
+//   console.log('difference: ', (endTime - startTime) * .01, ' ms');
+
+//   var result = JSON.parse(e.data.target);
+//   console.log('the result is: ', result);
+// };
+
+// var data = {
+//   options: {
+//     url: 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js',
+//     timeout: 1,
+//     isAsync: false
+//   }
+// };
+// startTime = performance.now();
+
+// cacheCheckWorker.postMessage(data);

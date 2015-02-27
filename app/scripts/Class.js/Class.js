@@ -17,7 +17,9 @@
   Class.prototype.constructor = Class;
   Class.prototype.createChild = function createChild(parent){
     var Child = function(){
-      parent.call(this);
+      if (parent.name !== 'XMLHttpRequest') {
+        parent.call(this);
+      };
       return this;
     };
     return Child;
